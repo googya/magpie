@@ -296,4 +296,12 @@ func TestAtomcodeEffortWithoutModelTableIsRefused(t *testing.T) {
 	if string(before) != string(after) {
 		t.Fatalf("the refused effort changed the config:\n%s", after)
 	}
+	// clearing a gone table's effort is a no-op, not an error
+	if err := a.Apply("effort", ""); err != nil {
+		t.Fatalf("clearing on a missing model table: %v", err)
+	}
+	after, _ = os.ReadFile(path)
+	if string(before) != string(after) {
+		t.Fatalf("the cleared effort changed the config:\n%s", after)
+	}
 }

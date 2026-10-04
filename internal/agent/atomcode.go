@@ -242,13 +242,18 @@ func atomcode(home string) *Agent {
 				if err != nil {
 					return err
 				}
+				if v == "" {
+					// clearing a gone table's effort is a no-op, nothing to
+					// orphan; a real table loses its reasoning_effort
+					if table == "" {
+						return nil
+					}
+					return edit.DelTOMLKey(path, table, "reasoning_effort")
+				}
 				if table == "" {
 					// the table is gone (Drift says so too): a fresh one of
 					// nothing but an effort would be an orphan
 					return fmt.Errorf("AtomCode's [models.%s] (config.toml) is gone — pick the model again", strconv.Quote(k))
-				}
-				if v == "" {
-					return edit.DelTOMLKey(path, table, "reasoning_effort")
 				}
 				ref := strings.TrimPrefix(k, magpieID+"/")
 				var offered []string
